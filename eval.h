@@ -17,6 +17,7 @@
 #define ADDITION_NODE 1001
 #define NUM_LITERAL_NODE  1002
 
+
 typedef struct _Tok {
    char buffer[MAX_BUFF + 1]; 
    int id;
@@ -49,5 +50,6 @@ int parse(FILE* inputFile, Expr** expr);
 
 Expr* createAddition(Expr* expr1,Expr* expr2);
 Expr* createNumLiteral(double value);
+
 
 #endif
