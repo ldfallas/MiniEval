@@ -1,31 +1,47 @@
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "eval.h"
+
+void tassert(int result, char* message, const char* testName) {
+  if (!result) {
+    printf("ASSERT FAILED in test \"%s\": %s\n", testName, message);
+  }
+}
 
 
 void test1()
 {
    Expr* expr;
+   char txt1[5];
    expr =
       createAddition(
             createAddition(
                createNumLiteral(10.2),
                createNumLiteral(-13)),
             createNumLiteral(13));
-   printf(
-         "\n%g\n",
+   snprintf(
+         txt1, 5,
+         "%g",
          evaluateExpression(
             expr
             )
          ); 
+   tassert(strncmp("10.2", txt1, 5) == 0,
+           "Expression evaluation failed", 
+           __FUNCTION__);
    printExpr(expr);
    printf("\n");
    deepReleaseExpr(expr);
-
 }
 
-
 int main(int argc, char* argv[]) {
+  printf("Running tests\n");
+  test1();
+  return 0;
+}
+
+int ___main(int argc, char* argv[]) {
 
    FILE* aFile;
    Token t;

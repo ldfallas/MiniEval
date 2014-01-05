@@ -1,7 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "eval.h"
+
+/* forward declarations */
+int peekToken(TokenStreamWithLookAhead* tokStream,
+              Token* resultToken);
+
 
 
 int isletter(int c) {
@@ -200,16 +206,17 @@ void printExpr(Expr* expr)
 int parse(FILE* inputFile, Expr** expr)
 {
   /* read_tok(aFile, &t)*/
-  /* SINGLEEXPR = lit | '(' MULTEXPR ')' 
+  /* SINGLEEXPR = lit | '(' MULTEXPR ')' */
   /* SUMEXPR = SINGLEEXPR ('-'|'+' SUMEXPR)? */
   /* MULTEXPR = SUMEXPR ('*'|'/' MULTEXPR)? */
+  return -1;
 }
 
 int parseSingleExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
    Token peekedToken;
-   int readResult, innerReadResult;
+   int readResult;
    Expr* innerExpr;
 
    readResult = peekToken(stream, &peekedToken);
@@ -247,11 +254,13 @@ int parseSingleExpr(
 
 int parseMultExpression(
        TokenStreamWithLookAhead* stream, 
-       Expr** expr) {
+       Expr** expr) {  
+  return -1;
 }
 int parseSumExprExpression(
        TokenStreamWithLookAhead* stream, 
        Expr** expr) {
+  return -1;
 }
 
 

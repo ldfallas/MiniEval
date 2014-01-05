@@ -45,11 +45,22 @@ typedef struct {
 
 TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file);
 int parse(FILE* inputFile, Expr** expr);
-
+double evaluateExpression(Expr* expr);
 
 
 Expr* createAddition(Expr* expr1,Expr* expr2);
 Expr* createNumLiteral(double value);
 
+void releaseTokStream(TokenStreamWithLookAhead* tokStream);
+int parseSingleExpr(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr);
 
+int readToken(TokenStreamWithLookAhead* tokStream,
+              Token* resultToken);
+
+void printExpr(Expr* expr);
+void deepReleaseExpr(Expr* expr);
+
+int read_tok(FILE* file, Token* tok) ;
 #endif
