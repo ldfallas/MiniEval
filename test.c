@@ -10,8 +10,7 @@ void tassert(int result, char* message, const char* testName) {
 }
 
 
-void test1()
-{
+void test1() {
    Expr* expr;
    char txt1[5];
    expr =
