@@ -9,6 +9,14 @@ void tassert(int result, char* message, const char* testName) {
   }
 }
 
+void testStrBuffer1() { 
+  OutStream buff;
+  buff = createStringOutStream(5);
+  printToOutStream( &buff, 3, "--");
+  tassert(strcmp(getStringFromStringOutStream(&buff), "--") == 0,
+	  "String printed",__FUNCTION__);
+  tassert(buff.size == 2,"Size not changed",__FUNCTION__);
+} 
 
 void test1() {
    Expr* expr;
@@ -36,6 +44,7 @@ void test1() {
 
 int main(int argc, char* argv[]) {
   printf("Running tests\n");
+  testStrBuffer1();
   test1();
   return 0;
 }

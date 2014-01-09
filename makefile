@@ -1,5 +1,5 @@
 test: clean
-	gcc eval.c test.c -o test
+	gcc -Wall -g  eval.c test.c -o test
 	./test
 
 clean: 

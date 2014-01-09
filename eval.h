@@ -43,6 +43,26 @@ typedef struct {
 } BinExpr;
 
 
+#define FILE_OUT_STREAM   1
+#define STRING_OUT_STREAM 2
+typedef struct {
+  int kind;
+  union {
+    struct {
+      char* buffer;
+      int capacity;
+      int size;
+    };
+    FILE* innerOutStream;
+  };  
+} OutStream;
+
+OutStream createFileOutStream(FILE* outStream);
+OutStream createStringOutStream(int initialSize);
+char* getStringFromStringOutStream(const OutStream* stream);
+void destroyOutStream(const OutStream* stream);
+void printToOutStream( OutStream* stream, int maxSize, const char* format, ...);
+
 TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file);
 int parse(FILE* inputFile, Expr** expr);
 double evaluateExpression(Expr* expr);

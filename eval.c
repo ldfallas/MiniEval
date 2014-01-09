@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdarg.h>
 #include "eval.h"
+
 
 /* forward declarations */
 int peekToken(TokenStreamWithLookAhead* tokStream,
@@ -232,7 +234,7 @@ int parseSingleExpr(
          if((readResult = readToken(stream, &peekedToken))
             && peekedToken.id == 4
             && strncmp(peekedToken.buffer, ")",2)) {
-            *expr = innerExpr;
+           *expr = innerExpr;
          printf("2,");
             return 0;
          } else {
@@ -310,6 +312,80 @@ void releaseTokStream(TokenStreamWithLookAhead* tokStream)
 }
 
 
+OutStream createFileOutStream(FILE* outStream) 
+{
+  OutStream result;
+  result.kind = FILE_OUT_STREAM;
+  result.innerOutStream = outStream;
+  return result;
+}
+
+OutStream createStringOutStream(int initialCapacity) {
+  OutStream result;
+  if (initialCapacity  > 0) {
+    result.kind = STRING_OUT_STREAM;
+    result.buffer = (char*)malloc(sizeof(char) * initialCapacity);
+    if (result.buffer != NULL) {
+      result.buffer[0] = '\0';
+      result.capacity = initialCapacity + 1;
+      result.size = 0;
+    }
+  }
+  return result;
+}
+char* getStringFromStringOutStream(const OutStream* stream) { 
+  if (stream->kind == STRING_OUT_STREAM) {
+    return stream->buffer;
+  } else {
+    return NULL;
+  }
+}
+void destroyOutStream(const OutStream* stream) {
+  if (stream->kind == FILE_OUT_STREAM) {
+    fclose(stream->innerOutStream);
+  } else if (stream->kind == STRING_OUT_STREAM) {
+    free(stream->buffer);
+  }
+}
 
 
+inline int _max(int x, int y) {
+  return x > y ? x : y;
+}
+
+
+void printToOutStream( OutStream* stream,int maxSize, const char* format, ...) {
+  va_list arglist;
+  int actualCapacity, newCapacity, printedSize;
+  char* tmpBuffer;
+
+  va_start( arglist, format);
+  if (stream->kind == FILE_OUT_STREAM) {
+    vfprintf(stream->innerOutStream, format, arglist);
+  } else if (stream->kind == STRING_OUT_STREAM) {
+    actualCapacity = stream->capacity - stream->size - 1;
+    if (maxSize > actualCapacity) {
+      newCapacity = _max((stream->capacity * 2) + 1,
+			 stream->capacity + maxSize + 1);
+      tmpBuffer = (char*)malloc(newCapacity);
+      strncpy(tmpBuffer, stream->buffer, stream->size);
+      /*TODO what happens in malloc fails????...*/
+      printedSize = vsnprintf(tmpBuffer + stream->size,
+			      maxSize, 
+			      format, 
+			      arglist);
+      free(stream->buffer);
+      stream->buffer = tmpBuffer;
+      stream->size = stream->size + printedSize;
+      stream->capacity = newCapacity;
+    } else {
+      printedSize = vsnprintf(stream->buffer + stream->size,
+			      maxSize, 
+			      format, 
+			      arglist);
+      stream->size = stream->size + printedSize;
+    }
+  }
+  va_end( arglist );
+}
 
