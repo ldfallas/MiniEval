@@ -1,21 +1,67 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdarg.h>
 #include "eval.h"
 
-void tassert(int result, char* message, const char* testName) {
+void tassert(int result, const char* testName, char* formatString, ...) {
+
+  va_list args;
+  va_start(args, formatString);
   if (!result) {
-    printf("ASSERT FAILED in test \"%s\": %s\n", testName, message);
+    printf("ASSERT FAILED in test \"%s\": ", testName);
+    vprintf(formatString, args);
+    printf("\n");
   }
+  va_end(args);
 }
+
+void tassert_equal_ints(int expectedValue,int actualValue, const char* testName) {
+  int comparisonResult;
+  comparisonResult = expectedValue == actualValue;
+  tassert(comparisonResult,
+	  testName,
+	  "expected: %d, actual %d", 
+	  expectedValue, 
+	  actualValue);
+}
+
+void tassert_equal_strings(char* expectedValue,char* actualValue, const char* testName) {
+  int comparisonResult;
+  comparisonResult = strcmp(expectedValue, actualValue) == 0;
+  tassert(comparisonResult,
+	  testName,
+	  "expected: %s, actual %s", 
+	  expectedValue, 
+	  actualValue);
+}
+
 
 void testStrBuffer1() { 
   OutStream buff;
   buff = createStringOutStream(5);
   printToOutStream( &buff, 3, "--");
   tassert(strcmp(getStringFromStringOutStream(&buff), "--") == 0,
-	  "String printed",__FUNCTION__);
-  tassert(buff.size == 2,"Size not changed",__FUNCTION__);
+	  __FUNCTION__, "String printed");
+  tassert_equal_ints(2, buff.size,__FUNCTION__);
+  destroyOutStream(&buff);
+} 
+
+void testStrBuffer2() { 
+  OutStream buff;
+  buff = createStringOutStream(5);
+  printToOutStream( &buff, 3, "12");
+  tassert_equal_strings( "12",
+			 getStringFromStringOutStream(&buff),
+			__FUNCTION__);
+  tassert_equal_ints(2, buff.size,__FUNCTION__);
+  printToOutStream( &buff, 3, "34");
+  printToOutStream( &buff, 3, "56");
+  tassert_equal_strings("123456",
+			getStringFromStringOutStream(&buff),
+			__FUNCTION__);
+  tassert_equal_ints(6, buff.size,__FUNCTION__);
+  destroyOutStream(&buff);
 } 
 
 void test1() {
@@ -35,8 +81,8 @@ void test1() {
             )
          ); 
    tassert(strncmp("10.2", txt1, 5) == 0,
-           "Expression evaluation failed", 
-           __FUNCTION__);
+	   __FUNCTION__,
+           "Expression evaluation failed");
    printExpr(expr);
    printf("\n");
    deepReleaseExpr(expr);
@@ -45,6 +91,7 @@ void test1() {
 int main(int argc, char* argv[]) {
   printf("Running tests\n");
   testStrBuffer1();
+  testStrBuffer2();
   test1();
   return 0;
 }
