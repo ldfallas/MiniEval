@@ -31,7 +31,7 @@ void tassert_equal_strings(char* expectedValue,char* actualValue, const char* te
   comparisonResult = strcmp(expectedValue, actualValue) == 0;
   tassert(comparisonResult,
 	  testName,
-	  "expected: %s, actual %s", 
+	  "expected: \"%s\", actual \"%s\"", 
 	  expectedValue, 
 	  actualValue);
 }
@@ -64,6 +64,24 @@ void testStrBuffer2() {
   destroyOutStream(&buff);
 } 
 
+void testStrBuffer3() { 
+  OutStream buff;
+  buff = createStringOutStream(5);
+  printToOutStream( &buff, 3, "--");
+  tassert_equal_strings( "--",
+			 getStringFromStringOutStream(&buff),
+			__FUNCTION__);
+  tassert_equal_ints(2, buff.size,__FUNCTION__);
+  printToOutStream( &buff, 30, "Number: %d",2000);
+  tassert_equal_strings("--Number: 2000",
+			getStringFromStringOutStream(&buff),
+			__FUNCTION__);
+  
+  tassert_equal_ints(14, buff.size,__FUNCTION__);
+  destroyOutStream(&buff);
+} 
+
+
 void test1() {
    Expr* expr;
    char txt1[5];
@@ -92,6 +110,7 @@ int main(int argc, char* argv[]) {
   printf("Running tests\n");
   testStrBuffer1();
   testStrBuffer2();
+  testStrBuffer3();
   test1();
   return 0;
 }
