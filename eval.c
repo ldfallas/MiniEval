@@ -372,19 +372,24 @@ void printToOutStream( OutStream* stream,int maxSize, const char* format, ...) {
       tmpBuffer = (char*)malloc(newCapacity);
       strncpy(tmpBuffer, stream->buffer, stream->size);
       /*TODO what happens in malloc fails????...*/
-      printedSize = vsnprintf(tmpBuffer + stream->size,
-			      maxSize, 
-			      format, 
-			      arglist);
+      vsnprintf(tmpBuffer + stream->size,
+                maxSize, 
+                format, 
+                arglist);
+      /* workaround for vsnprintf return type behavior*/
+      printedSize = strnlen(tmpBuffer + stream->size, maxSize);
+
       free(stream->buffer);
       stream->buffer = tmpBuffer;
       stream->size = stream->size + printedSize;
       stream->capacity = newCapacity;
     } else {
-      printedSize = vsnprintf(stream->buffer + stream->size,
-			      maxSize, 
-			      format, 
-			      arglist);
+      vsnprintf(stream->buffer + stream->size,
+	        maxSize, 
+	        format, 
+	        arglist);
+      /* workaround for vsnprintf return type behavior*/
+      printedSize = strnlen(stream->buffer + stream->size, maxSize);
       stream->size = stream->size + printedSize;
       stream->buffer[stream->size] = '\0';
     }

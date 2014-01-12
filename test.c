@@ -88,7 +88,7 @@ void testStrBuffer4() {
   tassert_equal_strings("-123",
 			getStringFromStringOutStream(&buff),
 			__FUNCTION__);
-  tassert_equal_ints(2, buff.size,__FUNCTION__);
+  tassert_equal_ints(4, buff.size,__FUNCTION__);
   destroyOutStream(&buff);
 } 
 
