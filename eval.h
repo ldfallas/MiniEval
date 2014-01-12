@@ -79,7 +79,7 @@ int parseSingleExpr(
 int readToken(TokenStreamWithLookAhead* tokStream,
               Token* resultToken);
 
-void printExpr(Expr* expr);
+void printExpr(Expr* expr,  OutStream* out);
 void deepReleaseExpr(Expr* expr);
 
 int read_tok(FILE* file, Token* tok) ;

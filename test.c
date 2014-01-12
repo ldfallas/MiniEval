@@ -101,9 +101,31 @@ void test1() {
    tassert(strncmp("10.2", txt1, 5) == 0,
 	   __FUNCTION__,
            "Expression evaluation failed");
-   printExpr(expr);
-   printf("\n");
+
    deepReleaseExpr(expr);
+   
+}
+
+void testTreeFormation1() {
+   Expr* expr;
+   OutStream stringOut;
+   
+   stringOut = createStringOutStream(15);
+   expr =
+      createAddition(
+            createAddition(
+               createNumLiteral(10.2),
+               createNumLiteral(-13)),
+            createNumLiteral(13));
+
+   printExpr(expr, &stringOut);
+
+   tassert_equal_strings("<<10.2 + -13> + 13>",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   destroyOutStream(&stringOut);
 }
 
 int main(int argc, char* argv[]) {
@@ -112,6 +134,7 @@ int main(int argc, char* argv[]) {
   testStrBuffer2();
   testStrBuffer3();
   test1();
+  testTreeFormation1();
   return 0;
 }
 
@@ -142,7 +165,7 @@ int ___main(int argc, char* argv[]) {
          printf("!--parse result %d\n", parseResult);
          if(!parseResult) { 
             printf("!parse result %d\n", parseResult);
-            printExpr(expr2);
+            /*printExpr(expr2);*/
          }
 
          /*
@@ -187,8 +210,8 @@ int ___main(int argc, char* argv[]) {
                expr
                )
             ); 
-      printExpr(expr);
-      printf("\n");
+      /*      printExpr(expr);
+	      printf("\n");*/
       deepReleaseExpr(expr);
 
    /*}*/

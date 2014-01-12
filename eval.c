@@ -185,22 +185,23 @@ void deepReleaseExpr(Expr* expr)
 
 }
 
-void printExpr(Expr* expr)
+void printExpr(Expr* expr, OutStream* out)
 {
+  
    switch(expr->id)
    {
       case ADDITION_NODE: 
-         printf("<");
-         printExpr(getLeftExprFromBin(expr));
-         printf(" + ");
-         printExpr(getRightExprFromBin(expr));
-         printf(">");
+	 printToOutStream(out, 2, "<");
+         printExpr(getLeftExprFromBin(expr), out);
+         printToOutStream(out, 4, " + ");
+         printExpr(getRightExprFromBin(expr), out);
+         printToOutStream(out, 2, ">");
          break;
       case NUM_LITERAL_NODE:
-         printf("%g",expr->innerValue);
+	 printToOutStream(out, 10, "%g", expr->innerValue);
          break;
       default:
-         printf("?? %d\n",expr->id);
+	 printToOutStream(out, 10, "?? %d\n",expr->id);
    }
 }
 
