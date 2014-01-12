@@ -81,6 +81,16 @@ void testStrBuffer3() {
   destroyOutStream(&buff);
 } 
 
+void testStrBuffer4() { 
+  OutStream buff;
+  buff = createStringOutStream(5);
+  printToOutStream( &buff, 5, "-%d-",12345);
+  tassert_equal_strings("-123",
+			getStringFromStringOutStream(&buff),
+			__FUNCTION__);
+  tassert_equal_ints(2, buff.size,__FUNCTION__);
+  destroyOutStream(&buff);
+} 
 
 void test1() {
    Expr* expr;
@@ -133,6 +143,7 @@ int main(int argc, char* argv[]) {
   testStrBuffer1();
   testStrBuffer2();
   testStrBuffer3();
+  testStrBuffer4();
   test1();
   testTreeFormation1();
   return 0;

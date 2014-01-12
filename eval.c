@@ -191,11 +191,11 @@ void printExpr(Expr* expr, OutStream* out)
    switch(expr->id)
    {
       case ADDITION_NODE: 
-	 printToOutStream(out, 2, "<");
-         printExpr(getLeftExprFromBin(expr), out);
+	 printToOutStream(out,2, "<");
+	 printExpr(getLeftExprFromBin(expr), out);
          printToOutStream(out, 4, " + ");
-         printExpr(getRightExprFromBin(expr), out);
-         printToOutStream(out, 2, ">");
+	 printExpr(getRightExprFromBin(expr), out);
+         printToOutStream(out, 5, ">");
          break;
       case NUM_LITERAL_NODE:
 	 printToOutStream(out, 10, "%g", expr->innerValue);
@@ -325,7 +325,8 @@ OutStream createStringOutStream(int initialCapacity) {
   OutStream result;
   if (initialCapacity  > 0) {
     result.kind = STRING_OUT_STREAM;
-    result.buffer = (char*)malloc(sizeof(char) * initialCapacity);
+    result.buffer = (char*)malloc(sizeof(char) * initialCapacity + 1);
+
     if (result.buffer != NULL) {
       result.buffer[0] = '\0';
       result.capacity = initialCapacity + 1;
@@ -385,6 +386,7 @@ void printToOutStream( OutStream* stream,int maxSize, const char* format, ...) {
 			      format, 
 			      arglist);
       stream->size = stream->size + printedSize;
+      stream->buffer[stream->size] = '\0';
     }
   }
   va_end( arglist );
