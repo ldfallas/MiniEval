@@ -149,10 +149,11 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
+
 int ___main(int argc, char* argv[]) {
 
    FILE* aFile;
-   Token t;
+   /*   Token t;*/
    int result;
    Expr* expr;
    int parseResult;
@@ -162,12 +163,12 @@ int ___main(int argc, char* argv[]) {
    if (argc == 2) {
       aFile = fopen(argv[1],"r");
       if (aFile != NULL) {
-         while(read_tok(aFile, &t) != -1)
+	/*         while(read_tok(aFile, &t) != -1)
          {
             printf("------");
             printf("token id=%d\n", t.id);
             printf("token buffer='%s'\n", t.buffer);
-         }
+	    }*/
          fclose(aFile);
          printf("*******************\n");
          aFile = fopen(argv[1],"r");

@@ -6,6 +6,7 @@
 #include "eval.h"
 
 
+
 /* forward declarations */
 int peekToken(TokenStreamWithLookAhead* tokStream,
               Token* resultToken);
@@ -25,7 +26,29 @@ int isparenthesis(int c) {
 }
 
 
-int read_tok(FILE* file, Token* tok) {
+int getCharFromStream(TokenStreamWithLookAhead* file) {
+  switch(file->kind)
+  {
+    case TOK_STREAM_KIND_FILE:
+      return fgetc(file->stream);
+    default:
+       return -1;
+  }
+}
+
+int ungetCharFromStream(TokenStreamWithLookAhead* file, int c) {
+  switch(file->kind)
+  {
+    case TOK_STREAM_KIND_FILE:
+      return ungetc(c, file->stream);
+    default:
+       return -1;
+  }
+}
+
+
+
+int read_tok(TokenStreamWithLookAhead* file, Token* tok) {
 
    int theChar;
    int c;
@@ -45,7 +68,7 @@ int read_tok(FILE* file, Token* tok) {
 
 
    while(!stop) {
-      theChar = fgetc(file);
+     theChar = getCharFromStream(file);
       c = theChar; 
       switch(state) {
          case BLANK_STATE:
@@ -80,7 +103,7 @@ int read_tok(FILE* file, Token* tok) {
                buffer[buffpos++] = (char)c;
             } else {
                buffer[buffpos++] = '\0';
-               ungetc(c, file);
+               ungetCharFromStream(file, c);
                stop = 1;
             }
             break;
@@ -90,7 +113,7 @@ int read_tok(FILE* file, Token* tok) {
                buffer[buffpos++] = c;
             } else  {
                buffer[buffpos++] = '\0';
-               ungetc(c, file);
+               ungetCharFromStream(file, c);
                stop = 1;
             }
             break;
@@ -280,7 +303,7 @@ int readToken(TokenStreamWithLookAhead* tokStream,
               Token* resultToken)
 {
    if (tokStream->bufferedToken == NULL) {
-      return read_tok(tokStream->stream, resultToken);
+      return read_tok(tokStream, resultToken);
    } else {
       *resultToken = *tokStream->bufferedToken;
       free(tokStream->bufferedToken);
@@ -294,7 +317,7 @@ int peekToken(TokenStreamWithLookAhead* tokStream,
 {
    int result;
    if (tokStream->bufferedToken == NULL) {
-      result = read_tok(tokStream->stream, resultToken);
+      result = read_tok(tokStream, resultToken);
       tokStream->bufferedToken = (Token*)malloc(sizeof(Token));
       *(tokStream->bufferedToken) =  *resultToken;
       return result;

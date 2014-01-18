@@ -24,10 +24,20 @@ typedef struct _Tok {
 } Token;
 
 typedef struct {
-   FILE* stream;
-   Token* bufferedToken; 
+  int kind;
+  union {
+    FILE* stream;
+    struct {
+      int position;
+      int maxValue;
+      char* content;
+    } buffer;
+  };
+  Token* bufferedToken; 
 } TokenStreamWithLookAhead;
 
+#define TOK_STREAM_KIND_FILE   100
+#define TOK_STREAM_KIND_STRING 101
 
 typedef struct {
    int id;
@@ -82,5 +92,5 @@ int readToken(TokenStreamWithLookAhead* tokStream,
 void printExpr(Expr* expr,  OutStream* out);
 void deepReleaseExpr(Expr* expr);
 
-int read_tok(FILE* file, Token* tok) ;
+int read_tok(TokenStreamWithLookAhead* file, Token* tok) ;
 #endif
