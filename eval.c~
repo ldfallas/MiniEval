@@ -31,14 +31,6 @@ int getCharFromStream(TokenStreamWithLookAhead* file) {
   {
     case TOK_STREAM_KIND_FILE:
       return fgetc(file->stream);
-    case TOK_STREAM_KIND_STRING:
-      if ((file->buffer.position + 1) < file->buffer.maxValue) {
-	file->buffer.position++;
-	return (int)file->buffer.content[file->buffer.position];
-      }
-      else {
-	return -1;
-      } 
     default:
        return -1;
   }
@@ -275,7 +267,7 @@ int parseSingleExpr(
          }
       } else if (peekedToken.id == 1) {
          readResult = readToken(stream, &peekedToken);
-         /*printf("middle read: %d ",readResult);*/
+         printf("middle read: %d ",readResult);
          *expr = createNumLiteral(atof(peekedToken.buffer));
          return 0;
       } else {
@@ -301,22 +293,10 @@ int parseSumExprExpression(
 
 TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file)
 {
-  TokenStreamWithLookAhead result;  
-  result.kind = TOK_STREAM_KIND_FILE;
-  result.stream = file;
-  result.bufferedToken = NULL;
-  return result;
-}
-
-TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content)
-{
-  TokenStreamWithLookAhead result;
-  result.kind = TOK_STREAM_KIND_STRING;  
-  result.buffer.position = -1;
-  result.buffer.maxValue = strlen(content);
-  result.buffer.content = content;
-  result.bufferedToken = NULL;
-  return result;
+ TokenStreamWithLookAhead result;  
+ result.stream = file;
+ result.bufferedToken = NULL;
+ return result;
 }
 
 int readToken(TokenStreamWithLookAhead* tokStream,

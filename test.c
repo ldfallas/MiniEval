@@ -138,6 +138,30 @@ void testTreeFormation1() {
    destroyOutStream(&stringOut);
 }
 
+
+void testBasicLiteralParsing() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString("10");
+   parseResult = parseSingleExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("10",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   destroyOutStream(&stringOut);
+}
+
+
 int main(int argc, char* argv[]) {
   printf("Running tests\n");
   testStrBuffer1();
@@ -146,6 +170,7 @@ int main(int argc, char* argv[]) {
   testStrBuffer4();
   test1();
   testTreeFormation1();
+  testBasicLiteralParsing();
   return 0;
 }
 

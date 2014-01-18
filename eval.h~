@@ -74,7 +74,6 @@ void destroyOutStream(const OutStream* stream);
 void printToOutStream( OutStream* stream, int maxSize, const char* format, ...);
 
 TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file);
-TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content);
 int parse(FILE* inputFile, Expr** expr);
 double evaluateExpression(Expr* expr);
 
