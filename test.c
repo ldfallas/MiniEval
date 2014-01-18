@@ -161,6 +161,31 @@ void testBasicLiteralParsing() {
    destroyOutStream(&stringOut);
 }
 
+void testBasicLiteralParsing2() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "\t    \t 10 \t \t";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseSingleExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("10",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   destroyOutStream(&stringOut);
+}
+
+
 
 int main(int argc, char* argv[]) {
   printf("Running tests\n");
@@ -171,6 +196,7 @@ int main(int argc, char* argv[]) {
   test1();
   testTreeFormation1();
   testBasicLiteralParsing();
+  testBasicLiteralParsing2();
   return 0;
 }
 

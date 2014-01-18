@@ -275,7 +275,7 @@ int parseSingleExpr(
          }
       } else if (peekedToken.id == 1) {
          readResult = readToken(stream, &peekedToken);
-         /*printf("middle read: %d ",readResult);*/
+         
          *expr = createNumLiteral(atof(peekedToken.buffer));
          return 0;
       } else {
