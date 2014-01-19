@@ -4,6 +4,13 @@
 #include <stdarg.h>
 #include "eval.h"
 
+void run_test(char* testname, void (*testfunc)()) {
+  printf("Running %s\n", testname);
+  testfunc();
+}
+
+#define RUN_TEST(testname) run_test(#testname, testname);
+
 void tassert(int result, const char* testName, char* formatString, ...) {
 
   va_list args;
@@ -186,17 +193,43 @@ void testBasicLiteralParsing2() {
 }
 
 
+void testBasicAdditionParsing1() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + 4";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseSingleExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("<3 + 4>",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   destroyOutStream(&stringOut);
+}
+
+
 
 int main(int argc, char* argv[]) {
   printf("Running tests\n");
-  testStrBuffer1();
-  testStrBuffer2();
-  testStrBuffer3();
-  testStrBuffer4();
-  test1();
-  testTreeFormation1();
-  testBasicLiteralParsing();
-  testBasicLiteralParsing2();
+  RUN_TEST(testStrBuffer1);
+  RUN_TEST(testStrBuffer2);
+  RUN_TEST(testStrBuffer3);
+  RUN_TEST(testStrBuffer4);
+  RUN_TEST(test1);
+  RUN_TEST(testTreeFormation1);
+  RUN_TEST(testBasicLiteralParsing);
+  RUN_TEST(testBasicLiteralParsing2);
+  RUN_TEST(testBasicAdditionParsing1);
   return 0;
 }
 

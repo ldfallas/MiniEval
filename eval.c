@@ -49,6 +49,14 @@ int ungetCharFromStream(TokenStreamWithLookAhead* file, int c) {
   {
     case TOK_STREAM_KIND_FILE:
       return ungetc(c, file->stream);
+    case TOK_STREAM_KIND_STRING:
+      if ((file->buffer.position - 1) >= 0) {
+	file->buffer.position--;
+	return 0;
+      }
+      else {
+	return -1;
+      } 
     default:
        return -1;
   }
