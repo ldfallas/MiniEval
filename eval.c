@@ -257,8 +257,8 @@ int parse(FILE* inputFile, Expr** expr)
 int parseSingleExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
-   Token peekedToken;
-   int readResult;
+   Token peekedToken, nextToken;
+   int readResult, nextTokenReadResult,secondExprResult;
    Expr* innerExpr;
 
    readResult = peekToken(stream, &peekedToken);
@@ -283,7 +283,25 @@ int parseSingleExpr(
          }
       } else if (peekedToken.id == 1) {
          readResult = readToken(stream, &peekedToken);
-         
+	 nextTokenReadResult = peekToken(stream, &nextToken);
+	 if (nextTokenReadResult == 0
+	     && nextToken.id == 3)
+	 {
+	   *expr = createNumLiteral(atof(peekedToken.buffer));
+	   readToken(stream, &nextToken);
+	   secondExprResult = parseSingleExpr(stream, &innerExpr);
+	   if (secondExprResult == 0) {
+	     *expr = createAddition(*expr, innerExpr);
+	     return 0;
+	   } else {
+	     return 0;
+	   }
+	   
+	 } else {
+	   *expr = createNumLiteral(atof(peekedToken.buffer));
+	   return 0;
+	 }
+
          *expr = createNumLiteral(atof(peekedToken.buffer));
          return 0;
       } else {

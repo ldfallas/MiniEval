@@ -217,6 +217,29 @@ void testBasicAdditionParsing1() {
    destroyOutStream(&stringOut);
 }
 
+void testMultiAdditionParsing1() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + 4 + 5";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseSingleExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("<3 + <4 + 5>>",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   destroyOutStream(&stringOut);
+}
 
 
 int main(int argc, char* argv[]) {
@@ -230,6 +253,7 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testBasicLiteralParsing);
   RUN_TEST(testBasicLiteralParsing2);
   RUN_TEST(testBasicAdditionParsing1);
+  RUN_TEST(testMultiAdditionParsing1);
   return 0;
 }
 
