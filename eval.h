@@ -14,14 +14,18 @@
 #define OP_MULT 102
 #define OP_DIV  103
 
-#define ADDITION_NODE 1001
-#define NUM_LITERAL_NODE  1002
+typedef enum {
+  ExprAdditionNode = 1000,
+  ExprNumLiteralNode,
+} ExprNodeType;
+
 
 typedef enum {
   TokNumeric,
   TokVariable,
   TokPar,
-  TokOperator
+  TokOperator,
+  TokEOF
 } TokenKind;
 
 typedef struct _Tok {

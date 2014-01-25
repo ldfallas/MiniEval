@@ -146,7 +146,7 @@ int read_tok(TokenStreamWithLookAhead* file, Token* tok) {
 
 
 int isAddition(Expr* expr) {
-   return expr->id == ADDITION_NODE;
+   return expr->id == ExprAdditionNode;
 }
 
 Expr* createAddition(Expr* expr1,Expr* expr2) {
@@ -155,7 +155,7 @@ Expr* createAddition(Expr* expr1,Expr* expr2) {
 
    
    result = malloc(sizeof(Expr));
-   result->id = ADDITION_NODE;
+   result->id = ExprAdditionNode;
    inner= malloc(sizeof(BinExpr));
    result->payload = inner;
    inner->left = expr1;
@@ -182,12 +182,12 @@ double evaluateExpression(Expr* expr)
    double x,y;
    switch(expr->id)
    {
-      case ADDITION_NODE: 
+      case ExprAdditionNode: 
          x = evaluateExpression(getLeftExprFromBin(expr));
          y = evaluateExpression(getRightExprFromBin(expr));
          return x + y;
          break;
-      case NUM_LITERAL_NODE:
+      case ExprNumLiteralNode:
          return getValueFromLiteral(expr);
          break;
       default:
@@ -200,7 +200,7 @@ Expr* createNumLiteral(double value)
    Expr* result;
 
    result = malloc(sizeof(Expr));
-   result->id = NUM_LITERAL_NODE; 
+   result->id = ExprNumLiteralNode; 
    result->innerValue = value;
 
    return result;
@@ -210,13 +210,13 @@ void deepReleaseExpr(Expr* expr)
 {
    switch(expr->id)
    {
-      case ADDITION_NODE: 
+      case ExprAdditionNode: 
          deepReleaseExpr(getLeftExprFromBin(expr));
          deepReleaseExpr(getRightExprFromBin(expr));
          free(expr->payload);
          free(expr);
          break;
-      case NUM_LITERAL_NODE:
+      case ExprNumLiteralNode:
          free(expr);
          break;
    }
@@ -228,14 +228,14 @@ void printExpr(Expr* expr, OutStream* out)
   
    switch(expr->id)
    {
-      case ADDITION_NODE: 
+      case ExprAdditionNode: 
 	 printToOutStream(out,2, "<");
 	 printExpr(getLeftExprFromBin(expr), out);
          printToOutStream(out, 4, " + ");
 	 printExpr(getRightExprFromBin(expr), out);
          printToOutStream(out, 5, ">");
          break;
-      case NUM_LITERAL_NODE:
+      case ExprNumLiteralNode:
 	 printToOutStream(out, 10, "%g", expr->innerValue);
          break;
       default:
