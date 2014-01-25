@@ -25,7 +25,6 @@ int isparenthesis(int c) {
    return c == '(' || c == ')';
 }
 
-
 int getCharFromStream(TokenStreamWithLookAhead* file) {
   switch(file->kind)
   {
@@ -91,22 +90,22 @@ int read_tok(TokenStreamWithLookAhead* file, Token* tok) {
             if (isdigit(c)) {
                buffer[buffpos++] = (char)c;
                state = NUMBER_STATE;
-               tok->id = 1;
+               tok->id = TokNumeric;
             } else if (isalpha(c)) {
 
                buffer[buffpos++] = (char)c;
                state = ID_STATE;
-               tok->id = 2;
+               tok->id = TokVariable;
             } else if (isoperator(c)) {
                buffer[buffpos++] = (char)c;
                buffer[buffpos++] = '\0';
                stop = 1;
-               tok->id = 3;
+               tok->id = TokOperator;
             } else if (isparenthesis(c)) {
                buffer[buffpos++] = (char)c;
                buffer[buffpos++] = '\0';
                stop = 1;
-               tok->id = 4;
+               tok->id = TokPar;
             } else if (isspace(c) && theChar != EOF) {
                continue;
             }
@@ -264,7 +263,7 @@ int parseSingleExpr(
    readResult = peekToken(stream, &peekedToken);
    if (readResult == 0)
    {
-      if (peekedToken.id == 4 
+      if (peekedToken.id == TokPar 
           && strncmp(peekedToken.buffer,"(",2) == 0) {
          readToken(stream, &peekedToken);
          parseSingleExpr(stream,&innerExpr);
@@ -272,7 +271,7 @@ int parseSingleExpr(
 
 
          if((readResult = readToken(stream, &peekedToken))
-            && peekedToken.id == 4
+            && peekedToken.id == TokPar
             && strncmp(peekedToken.buffer, ")",2)) {
            *expr = innerExpr;
          printf("2,");
@@ -281,11 +280,11 @@ int parseSingleExpr(
          printf("3, -- 00%d ",readResult);
             return -1;
          }
-      } else if (peekedToken.id == 1) {
+      } else if (peekedToken.id == TokNumeric) {
          readResult = readToken(stream, &peekedToken);
 	 nextTokenReadResult = peekToken(stream, &nextToken);
 	 if (nextTokenReadResult == 0
-	     && nextToken.id == 3)
+	     && nextToken.id == TokOperator)
 	 {
 	   *expr = createNumLiteral(atof(peekedToken.buffer));
 	   readToken(stream, &nextToken);

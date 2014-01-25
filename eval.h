@@ -17,10 +17,16 @@
 #define ADDITION_NODE 1001
 #define NUM_LITERAL_NODE  1002
 
+typedef enum {
+  TokNumeric,
+  TokVariable,
+  TokPar,
+  TokOperator
+} TokenKind;
 
 typedef struct _Tok {
    char buffer[MAX_BUFF + 1]; 
-   int id;
+   TokenKind id;
 } Token;
 
 typedef struct {
