@@ -287,9 +287,7 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testBasicLiteralParsing2);
   RUN_TEST(testBasicAdditionParsing1);
   RUN_TEST(testMultiAdditionParsing1);
-  while(1) {
   RUN_TEST(testSubtraction1);
-  }
   return 0;
 }
 
