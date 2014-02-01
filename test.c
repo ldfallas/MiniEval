@@ -165,6 +165,7 @@ void testBasicLiteralParsing() {
 			__FUNCTION__);
    
    deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
    destroyOutStream(&stringOut);
 }
 
@@ -190,6 +191,7 @@ void testBasicLiteralParsing2() {
    
    deepReleaseExpr(expr);
    destroyOutStream(&stringOut);
+   releaseTokStream(&tokstream);
 }
 
 
@@ -214,6 +216,7 @@ void testBasicAdditionParsing1() {
 			__FUNCTION__);
    
    deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
    destroyOutStream(&stringOut);
 }
 
@@ -238,12 +241,42 @@ void testMultiAdditionParsing1() {
 			__FUNCTION__);
    
    deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+}
+
+void testSubtraction1() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + 3 * 5 / 3 - 5";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseSingleExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("<3 + <3 * <5 / <3 - 5>>>>",
+			getStringFromStringOutStream(&stringOut),
+			__FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
    destroyOutStream(&stringOut);
 }
 
 
+
+
 int main(int argc, char* argv[]) {
+  
   printf("Running tests\n");
+
   RUN_TEST(testStrBuffer1);
   RUN_TEST(testStrBuffer2);
   RUN_TEST(testStrBuffer3);
@@ -254,6 +287,9 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testBasicLiteralParsing2);
   RUN_TEST(testBasicAdditionParsing1);
   RUN_TEST(testMultiAdditionParsing1);
+  while(1) {
+  RUN_TEST(testSubtraction1);
+  }
   return 0;
 }
 

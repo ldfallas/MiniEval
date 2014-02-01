@@ -16,6 +16,9 @@
 
 typedef enum {
   ExprAdditionNode = 1000,
+  ExprSubtractionNode,
+  ExprMultiplicationNode,
+  ExprDivisionNode,
   ExprNumLiteralNode,
 } ExprNodeType;
 

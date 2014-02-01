@@ -108,7 +108,10 @@ int read_tok(TokenStreamWithLookAhead* file, Token* tok) {
                tok->id = TokPar;
             } else if (isspace(c) && theChar != EOF) {
                continue;
-            }
+            } else {
+	      result = -1;
+	      return result;
+	    }
           break;
          case NUMBER_STATE:
             if (isdigit(c) && (buffpos < MAX_BUFF))
@@ -149,19 +152,37 @@ int isAddition(Expr* expr) {
    return expr->id == ExprAdditionNode;
 }
 
-Expr* createAddition(Expr* expr1,Expr* expr2) {
+
+
+Expr* createBinaryOperation(ExprNodeType kind,Expr* expr1, Expr* expr2) {
    Expr* result;
    BinExpr* inner;
 
-   
    result = malloc(sizeof(Expr));
-   result->id = ExprAdditionNode;
-   inner= malloc(sizeof(BinExpr));
+   result->id = kind;
+   inner = malloc(sizeof(BinExpr));
    result->payload = inner;
    inner->left = expr1;
    inner->right = expr2;
 
    return result;
+}
+
+
+Expr* createAddition(Expr* expr1, Expr* expr2) {
+  return createBinaryOperation(ExprAdditionNode, expr1, expr2);
+}
+
+Expr* createDivision(Expr* expr1, Expr* expr2) {
+  return createBinaryOperation(ExprDivisionNode ,expr1 ,expr2);
+}
+
+Expr* createMultiplication(Expr* expr1, Expr* expr2) {
+  return createBinaryOperation(ExprMultiplicationNode ,expr1 ,expr2);
+}
+
+Expr* createSubtraction(Expr* expr1, Expr* expr2) {
+  return createBinaryOperation(ExprSubtractionNode ,expr1 ,expr2);
 }
 
 double getValueFromLiteral(Expr* expr)
@@ -206,11 +227,55 @@ Expr* createNumLiteral(double value)
    return result;
 }
 
+ExprNodeType getNodeTypeFromOperator(const char op) {
+  switch(op) {
+    case '*':
+      return ExprMultiplicationNode;
+    case '/':
+      return ExprDivisionNode;
+    case '-':
+      return ExprSubtractionNode;
+    case '+':
+      return ExprAdditionNode;
+    default:
+      perror("Unexpected operator char");
+      return 0;
+  }						
+} 
+
+int getOperatorFromNodeType(const ExprNodeType nodeType, char* op) {
+  int result;
+  result = 0;
+  switch(nodeType) {
+    case ExprMultiplicationNode:
+      *op =  '*';
+      break;
+    case ExprDivisionNode:
+      *op = '/';
+      break;
+    case ExprSubtractionNode:
+      *op =  '-';
+      break;
+    case ExprAdditionNode:
+      *op = '+';
+      break;
+    default:
+      *op = '?';
+      result = 1;
+      break;
+  }	
+  return result;
+} 
+
+
 void deepReleaseExpr(Expr* expr)
 {
    switch(expr->id)
    {
       case ExprAdditionNode: 
+      case ExprSubtractionNode: 
+      case ExprMultiplicationNode: 
+      case ExprDivisionNode: 
          deepReleaseExpr(getLeftExprFromBin(expr));
          deepReleaseExpr(getRightExprFromBin(expr));
          free(expr->payload);
@@ -225,13 +290,17 @@ void deepReleaseExpr(Expr* expr)
 
 void printExpr(Expr* expr, OutStream* out)
 {
-  
+   char operatorChar;
    switch(expr->id)
    {
       case ExprAdditionNode: 
+      case ExprSubtractionNode: 
+      case ExprMultiplicationNode: 
+      case ExprDivisionNode: 
 	 printToOutStream(out,2, "<");
 	 printExpr(getLeftExprFromBin(expr), out);
-         printToOutStream(out, 4, " + ");
+	 getOperatorFromNodeType(expr->id, &operatorChar);
+         printToOutStream(out, 4, " %c ", operatorChar);
 	 printExpr(getRightExprFromBin(expr), out);
          printToOutStream(out, 5, ">");
          break;
@@ -290,7 +359,8 @@ int parseSingleExpr(
 	   readToken(stream, &nextToken);
 	   secondExprResult = parseSingleExpr(stream, &innerExpr);
 	   if (secondExprResult == 0) {
-	     *expr = createAddition(*expr, innerExpr);
+	     *expr = createBinaryOperation(
+			      getNodeTypeFromOperator(nextToken.buffer[0]), *expr, innerExpr);
 	     return 0;
 	   } else {
 	     return 0;
@@ -306,10 +376,11 @@ int parseSingleExpr(
       } else {
          return -1;
       }
-
    }
    return readResult;
 }
+
+
 
 int parseMultExpression(
        TokenStreamWithLookAhead* stream, 
