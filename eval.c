@@ -32,11 +32,11 @@ int getCharFromStream(TokenStreamWithLookAhead* file) {
       return fgetc(file->stream);
     case TOK_STREAM_KIND_STRING:
       if ((file->buffer.position + 1) < file->buffer.maxValue) {
-	file->buffer.position++;
-	return (int)file->buffer.content[file->buffer.position];
+        file->buffer.position++;
+        return (int)file->buffer.content[file->buffer.position];
       }
       else {
-	return -1;
+        return -1;
       } 
     default:
        return -1;
@@ -50,11 +50,11 @@ int ungetCharFromStream(TokenStreamWithLookAhead* file, int c) {
       return ungetc(c, file->stream);
     case TOK_STREAM_KIND_STRING:
       if ((file->buffer.position - 1) >= 0) {
-	file->buffer.position--;
-	return 0;
+        file->buffer.position--;
+        return 0;
       }
       else {
-	return -1;
+        return -1;
       } 
     default:
        return -1;
@@ -109,9 +109,9 @@ int read_tok(TokenStreamWithLookAhead* file, Token* tok) {
             } else if (isspace(c) && theChar != EOF) {
                continue;
             } else {
-	      result = -1;
-	      return result;
-	    }
+              result = -1;
+              return result;
+            }
           break;
          case NUMBER_STATE:
             if (isdigit(c) && (buffpos < MAX_BUFF))
@@ -240,7 +240,7 @@ ExprNodeType getNodeTypeFromOperator(const char op) {
     default:
       perror("Unexpected operator char");
       return 0;
-  }						
+  }                                             
 } 
 
 int getOperatorFromNodeType(const ExprNodeType nodeType, char* op) {
@@ -263,7 +263,7 @@ int getOperatorFromNodeType(const ExprNodeType nodeType, char* op) {
       *op = '?';
       result = 1;
       break;
-  }	
+  }     
   return result;
 } 
 
@@ -297,18 +297,18 @@ void printExpr(Expr* expr, OutStream* out)
       case ExprSubtractionNode: 
       case ExprMultiplicationNode: 
       case ExprDivisionNode: 
-	 printToOutStream(out,2, "<");
-	 printExpr(getLeftExprFromBin(expr), out);
-	 getOperatorFromNodeType(expr->id, &operatorChar);
+         printToOutStream(out,2, "<");
+         printExpr(getLeftExprFromBin(expr), out);
+         getOperatorFromNodeType(expr->id, &operatorChar);
          printToOutStream(out, 4, " %c ", operatorChar);
-	 printExpr(getRightExprFromBin(expr), out);
+         printExpr(getRightExprFromBin(expr), out);
          printToOutStream(out, 5, ">");
          break;
       case ExprNumLiteralNode:
-	 printToOutStream(out, 10, "%g", expr->innerValue);
+         printToOutStream(out, 10, "%g", expr->innerValue);
          break;
       default:
-	 printToOutStream(out, 10, "?? %d\n",expr->id);
+         printToOutStream(out, 10, "?? %d\n",expr->id);
    }
 }
 
@@ -351,25 +351,25 @@ int parseSingleExpr(
          }
       } else if (peekedToken.id == TokNumeric) {
          readResult = readToken(stream, &peekedToken);
-	 nextTokenReadResult = peekToken(stream, &nextToken);
-	 if (nextTokenReadResult == 0
-	     && nextToken.id == TokOperator)
-	 {
-	   *expr = createNumLiteral(atof(peekedToken.buffer));
-	   readToken(stream, &nextToken);
-	   secondExprResult = parseSingleExpr(stream, &innerExpr);
-	   if (secondExprResult == 0) {
-	     *expr = createBinaryOperation(
-			      getNodeTypeFromOperator(nextToken.buffer[0]), *expr, innerExpr);
-	     return 0;
-	   } else {
-	     return 0;
-	   }
-	   
-	 } else {
-	   *expr = createNumLiteral(atof(peekedToken.buffer));
-	   return 0;
-	 }
+         nextTokenReadResult = peekToken(stream, &nextToken);
+         if (nextTokenReadResult == 0
+             && nextToken.id == TokOperator)
+         {
+           *expr = createNumLiteral(atof(peekedToken.buffer));
+           readToken(stream, &nextToken);
+           secondExprResult = parseSingleExpr(stream, &innerExpr);
+           if (secondExprResult == 0) {
+             *expr = createBinaryOperation(
+                              getNodeTypeFromOperator(nextToken.buffer[0]), *expr, innerExpr);
+             return 0;
+           } else {
+             return 0;
+           }
+           
+         } else {
+           *expr = createNumLiteral(atof(peekedToken.buffer));
+           return 0;
+         }
 
          *expr = createNumLiteral(atof(peekedToken.buffer));
          return 0;
@@ -507,7 +507,7 @@ void printToOutStream( OutStream* stream,int maxSize, const char* format, ...) {
     actualCapacity = stream->capacity - stream->size - 1;
     if (maxSize > actualCapacity) {
       newCapacity = _max((stream->capacity * 2) + 1,
-			 stream->capacity + maxSize + 1);
+                         stream->capacity + maxSize + 1);
       tmpBuffer = (char*)malloc(newCapacity);
       strncpy(tmpBuffer, stream->buffer, stream->size);
       /*TODO what happens in malloc fails????...*/
@@ -524,9 +524,9 @@ void printToOutStream( OutStream* stream,int maxSize, const char* format, ...) {
       stream->capacity = newCapacity;
     } else {
       vsnprintf(stream->buffer + stream->size,
-	        maxSize, 
-	        format, 
-	        arglist);
+                maxSize, 
+                format, 
+                arglist);
       /* workaround for vsnprintf return type behavior*/
       printedSize = strnlen(stream->buffer + stream->size, maxSize);
       stream->size = stream->size + printedSize;

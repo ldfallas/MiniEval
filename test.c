@@ -27,20 +27,20 @@ void tassert_equal_ints(int expectedValue,int actualValue, const char* testName)
   int comparisonResult;
   comparisonResult = expectedValue == actualValue;
   tassert(comparisonResult,
-	  testName,
-	  "expected: %d, actual %d", 
-	  expectedValue, 
-	  actualValue);
+          testName,
+          "expected: %d, actual %d", 
+          expectedValue, 
+          actualValue);
 }
 
 void tassert_equal_strings(char* expectedValue,char* actualValue, const char* testName) {
   int comparisonResult;
   comparisonResult = strcmp(expectedValue, actualValue) == 0;
   tassert(comparisonResult,
-	  testName,
-	  "expected: \"%s\", actual \"%s\"", 
-	  expectedValue, 
-	  actualValue);
+          testName,
+          "expected: \"%s\", actual \"%s\"", 
+          expectedValue, 
+          actualValue);
 }
 
 
@@ -49,7 +49,7 @@ void testStrBuffer1() {
   buff = createStringOutStream(5);
   printToOutStream( &buff, 3, "--");
   tassert(strcmp(getStringFromStringOutStream(&buff), "--") == 0,
-	  __FUNCTION__, "String printed");
+          __FUNCTION__, "String printed");
   tassert_equal_ints(2, buff.size,__FUNCTION__);
   destroyOutStream(&buff);
 } 
@@ -59,14 +59,14 @@ void testStrBuffer2() {
   buff = createStringOutStream(5);
   printToOutStream( &buff, 3, "12");
   tassert_equal_strings( "12",
-			 getStringFromStringOutStream(&buff),
-			__FUNCTION__);
+                         getStringFromStringOutStream(&buff),
+                        __FUNCTION__);
   tassert_equal_ints(2, buff.size,__FUNCTION__);
   printToOutStream( &buff, 3, "34");
   printToOutStream( &buff, 3, "56");
   tassert_equal_strings("123456",
-			getStringFromStringOutStream(&buff),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&buff),
+                        __FUNCTION__);
   tassert_equal_ints(6, buff.size,__FUNCTION__);
   destroyOutStream(&buff);
 } 
@@ -76,13 +76,13 @@ void testStrBuffer3() {
   buff = createStringOutStream(5);
   printToOutStream( &buff, 3, "--");
   tassert_equal_strings( "--",
-			 getStringFromStringOutStream(&buff),
-			__FUNCTION__);
+                         getStringFromStringOutStream(&buff),
+                        __FUNCTION__);
   tassert_equal_ints(2, buff.size,__FUNCTION__);
   printToOutStream( &buff, 30, "Number: %d",2000);
   tassert_equal_strings("--Number: 2000",
-			getStringFromStringOutStream(&buff),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&buff),
+                        __FUNCTION__);
   
   tassert_equal_ints(14, buff.size,__FUNCTION__);
   destroyOutStream(&buff);
@@ -93,8 +93,8 @@ void testStrBuffer4() {
   buff = createStringOutStream(5);
   printToOutStream( &buff, 5, "-%d-",12345);
   tassert_equal_strings("-123",
-			getStringFromStringOutStream(&buff),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&buff),
+                        __FUNCTION__);
   tassert_equal_ints(4, buff.size,__FUNCTION__);
   destroyOutStream(&buff);
 } 
@@ -116,7 +116,7 @@ void test1() {
             )
          ); 
    tassert(strncmp("10.2", txt1, 5) == 0,
-	   __FUNCTION__,
+           __FUNCTION__,
            "Expression evaluation failed");
 
    deepReleaseExpr(expr);
@@ -138,8 +138,8 @@ void testTreeFormation1() {
    printExpr(expr, &stringOut);
 
    tassert_equal_strings("<<10.2 + -13> + 13>",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    destroyOutStream(&stringOut);
@@ -161,8 +161,8 @@ void testBasicLiteralParsing() {
    }
    printExpr(expr, &stringOut);
    tassert_equal_strings("10",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    releaseTokStream(&tokstream);
@@ -186,8 +186,8 @@ void testBasicLiteralParsing2() {
    }
    printExpr(expr, &stringOut);
    tassert_equal_strings("10",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    destroyOutStream(&stringOut);
@@ -212,8 +212,8 @@ void testBasicAdditionParsing1() {
    }
    printExpr(expr, &stringOut);
    tassert_equal_strings("<3 + 4>",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    releaseTokStream(&tokstream);
@@ -237,8 +237,8 @@ void testMultiAdditionParsing1() {
    }
    printExpr(expr, &stringOut);
    tassert_equal_strings("<3 + <4 + 5>>",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    releaseTokStream(&tokstream);
@@ -262,8 +262,8 @@ void testSubtraction1() {
    }
    printExpr(expr, &stringOut);
    tassert_equal_strings("<3 + <3 * <5 / <3 - 5>>>>",
-			getStringFromStringOutStream(&stringOut),
-			__FUNCTION__);
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
    
    deepReleaseExpr(expr);
    releaseTokStream(&tokstream);
@@ -305,12 +305,12 @@ int ___main(int argc, char* argv[]) {
    if (argc == 2) {
       aFile = fopen(argv[1],"r");
       if (aFile != NULL) {
-	/*         while(read_tok(aFile, &t) != -1)
+        /*         while(read_tok(aFile, &t) != -1)
          {
             printf("------");
             printf("token id=%d\n", t.id);
             printf("token buffer='%s'\n", t.buffer);
-	    }*/
+            }*/
          fclose(aFile);
          printf("*******************\n");
          aFile = fopen(argv[1],"r");
@@ -365,7 +365,7 @@ int ___main(int argc, char* argv[]) {
                )
             ); 
       /*      printExpr(expr);
-	      printf("\n");*/
+              printf("\n");*/
       deepReleaseExpr(expr);
 
    /*}*/
