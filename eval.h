@@ -96,7 +96,7 @@ Expr* createAddition(Expr* expr1,Expr* expr2);
 Expr* createNumLiteral(double value);
 
 void releaseTokStream(TokenStreamWithLookAhead* tokStream);
-int parseSingleExpr(
+int parseExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr);
 

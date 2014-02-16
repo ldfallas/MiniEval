@@ -154,7 +154,7 @@ void testBasicLiteralParsing() {
    
    stringOut = createStringOutStream(15);
    tokstream = createTokenStreamWithLookAheadFromString("10");
-   parseResult = parseSingleExpr(&tokstream, &expr);
+   parseResult = parseExpr(&tokstream, &expr);
    tassert(!parseResult, __FUNCTION__, "Parse error");
    if (parseResult) {
      return;
@@ -179,7 +179,7 @@ void testBasicLiteralParsing2() {
    stringToParse = "\t    \t 10 \t \t";
    stringOut = createStringOutStream(15);
    tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
-   parseResult = parseSingleExpr(&tokstream, &expr);
+   parseResult = parseExpr(&tokstream, &expr);
    tassert(!parseResult, __FUNCTION__, "Parse error");
    if (parseResult) {
      return;
@@ -205,7 +205,7 @@ void testBasicAdditionParsing1() {
    stringToParse = "3 + 4";
    stringOut = createStringOutStream(15);
    tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
-   parseResult = parseSingleExpr(&tokstream, &expr);
+   parseResult = parseExpr(&tokstream, &expr);
    tassert(!parseResult, __FUNCTION__, "Parse error");
    if (parseResult) {
      return;
@@ -230,7 +230,7 @@ void testMultiAdditionParsing1() {
    stringToParse = "3 + 4 + 5";
    stringOut = createStringOutStream(15);
    tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
-   parseResult = parseSingleExpr(&tokstream, &expr);
+   parseResult = parseExpr(&tokstream, &expr);
    tassert(!parseResult, __FUNCTION__, "Parse error");
    if (parseResult) {
      return;
@@ -255,7 +255,7 @@ void testSubtraction1() {
    stringToParse = "3 + 3 * 5 / 3 - 5";
    stringOut = createStringOutStream(15);
    tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
-   parseResult = parseSingleExpr(&tokstream, &expr);
+   parseResult = parseExpr(&tokstream, &expr);
    tassert(!parseResult, __FUNCTION__, "Parse error");
    if (parseResult) {
      return;
@@ -315,7 +315,7 @@ int ___main(int argc, char* argv[]) {
          printf("*******************\n");
          aFile = fopen(argv[1],"r");
          tokstream = createTokenStreamWithLookAhead(aFile);
-         parseResult = parseSingleExpr(&tokstream, &expr2);
+         parseResult = parseExpr(&tokstream, &expr2);
          printf("!--parse result %d\n", parseResult);
          if(!parseResult) { 
             printf("!parse result %d\n", parseResult);

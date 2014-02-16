@@ -326,6 +326,140 @@ int parseSingleExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
    Token peekedToken, nextToken;
+   int readResult, nextTokenReadResult, parseResult;
+   Expr* innerExpr;
+
+   readResult = peekToken(stream, &peekedToken);
+   if (readResult == 0)
+   {
+     if (peekedToken.id == TokNumeric) {
+       readResult = readToken(stream, &peekedToken);
+       *expr = createNumLiteral(atof(peekedToken.buffer)); 
+       parseResult = 0;
+     }
+   } else {
+     parseResult = parseParenExpr(stream, expr);
+   }
+   return parseResult;
+}
+
+int nextTokenIsOperatorWithName(
+	TokenStreamWithLookAhead* stream,
+	const char* operatorText) {
+   Token peekedToken;
+   int readResult, result;
+   result = 0;
+   readResult = peekToken(stream, &peekedToken);
+   if (readResult == 0
+       && peekedToken.id == TokOperator
+       && strncmp(peekedToken.buffer, operatorText, 1) == 0)
+   {
+     result = 1;
+   }
+   return result;
+}
+
+int parseParenExpr(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr) {
+   Token peekedToken, nextToken;
+   int readResult, 
+       nextTokenReadResult,
+       secondExprResult,
+       innerParseResult;
+   Expr* innerExpr;
+
+   readResult = peekToken(stream, &peekedToken);
+   if (readResult == 0)
+   {
+      if (peekedToken.id == TokPar 
+          && strncmp(peekedToken.buffer,"(",2) == 0) {
+         readToken(stream, &peekedToken);
+         innerParseResult = parseExpr(stream,&innerExpr);
+         if(innerParseResult == 0
+	    && (readResult = readToken(stream, &peekedToken))
+            && peekedToken.id == TokPar
+            && strncmp(peekedToken.buffer, ")",2)) {
+           *expr = innerExpr;
+            return 0;
+         } else {
+            return -1;
+         }
+      }
+   }
+}
+int parseMultiExpr(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr) {
+   Token peekedToken, operatorToken;
+   int readResult, 
+       nextTokenReadResult,
+       secondExprResult,
+       parseResult,
+       firstParseResult;
+   Expr *innerExpr1, *innerExpr2;
+   
+   parseResult = -1;
+   firstParseResult = parseSingleExpr(stream, &innerExpr1);
+   if (firstParseResult == 0) {
+      if (nextTokenIsOperatorWithName(stream, "*")
+            || nextTokenIsOperatorWithName(stream, "/")) {
+         readResult = readToken(stream, &operatorToken);
+         secondExprResult = parseMultiExpr(stream, &innerExpr2);
+         if (secondExprResult == 0) {
+             *expr = createBinaryOperation(
+                         getNodeTypeFromOperator(operatorToken.buffer[0]), 
+                         innerExpr1, 
+                         innerExpr2);
+             parseResult = 0;
+
+         }
+      } else {
+         *expr = innerExpr1;
+         parseResult = 0;
+      }
+   }
+   return parseResult;
+}
+
+int parseExpr(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr) {
+   Token peekedToken, operatorToken;
+   int readResult, 
+       nextTokenReadResult,
+       secondExprResult,
+       parseResult,
+       firstParseResult;
+   Expr *innerExpr1, *innerExpr2;
+   
+   parseResult = -1;
+   firstParseResult = parseMultiExpr(stream, &innerExpr1);
+   if (firstParseResult == 0) {
+      if (nextTokenIsOperatorWithName(stream, "+")
+            || nextTokenIsOperatorWithName(stream, "-")) {
+         readResult = readToken(stream, &operatorToken);
+         secondExprResult = parseExpr(stream, &innerExpr2);
+         if (secondExprResult == 0) {
+             *expr = createBinaryOperation(
+                         getNodeTypeFromOperator(operatorToken.buffer[0]), 
+                         innerExpr1, 
+                         innerExpr2);
+             parseResult = 0;
+
+         }
+      } else {
+         *expr = innerExpr1;
+         parseResult = 0;
+      }
+   }
+   return parseResult;
+}
+
+int parseExpr__(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr) {
+   Token peekedToken, nextToken;
    int readResult, nextTokenReadResult,secondExprResult;
    Expr* innerExpr;
 
@@ -335,8 +469,7 @@ int parseSingleExpr(
       if (peekedToken.id == TokPar 
           && strncmp(peekedToken.buffer,"(",2) == 0) {
          readToken(stream, &peekedToken);
-         parseSingleExpr(stream,&innerExpr);
-         printf("1,");
+         parseExpr(stream,&innerExpr);
 
 
          if((readResult = readToken(stream, &peekedToken))
@@ -353,11 +486,12 @@ int parseSingleExpr(
          readResult = readToken(stream, &peekedToken);
          nextTokenReadResult = peekToken(stream, &nextToken);
          if (nextTokenReadResult == 0
-             && nextToken.id == TokOperator)
+             && nextToken.id == TokOperator
+	     && strncmp(nextToken.buffer,"+", 1) == 0)
          {
            *expr = createNumLiteral(atof(peekedToken.buffer));
            readToken(stream, &nextToken);
-           secondExprResult = parseSingleExpr(stream, &innerExpr);
+           secondExprResult = parseExpr(stream, &innerExpr);
            if (secondExprResult == 0) {
              *expr = createBinaryOperation(
                               getNodeTypeFromOperator(nextToken.buffer[0]), *expr, innerExpr);
@@ -365,9 +499,8 @@ int parseSingleExpr(
            } else {
              return 0;
            }
-           
          } else {
-           *expr = createNumLiteral(atof(peekedToken.buffer));
+           *expr = createNumLiteral(atof(peekedToken.buffer)); 
            return 0;
          }
 
@@ -421,7 +554,8 @@ int readToken(TokenStreamWithLookAhead* tokStream,
    if (tokStream->bufferedToken == NULL) {
       return read_tok(tokStream, resultToken);
    } else {
-      *resultToken = *tokStream->bufferedToken;
+      /**resultToken = *tokStream->bufferedToken;*/
+      memcpy(resultToken, tokStream->bufferedToken, sizeof(Token));
       free(tokStream->bufferedToken);
       tokStream->bufferedToken = NULL;
       return 1; 
@@ -438,8 +572,9 @@ int peekToken(TokenStreamWithLookAhead* tokStream,
       *(tokStream->bufferedToken) =  *resultToken;
       return result;
    } else {
-      *resultToken = *tokStream->bufferedToken;
-      tokStream->bufferedToken = NULL;
+      /* *resultToken = *tokStream->bufferedToken; */
+      memcpy(resultToken, tokStream->bufferedToken, sizeof(Token));
+      /*tokStream->bufferedToken = NULL;*/
       return 0; 
    }
 }
