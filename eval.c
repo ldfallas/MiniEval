@@ -322,12 +322,15 @@ int parse(FILE* inputFile, Expr** expr)
   return -1;
 }
 
+int parseParenExpr(
+        TokenStreamWithLookAhead* stream, 
+        Expr** expr);
+
 int parseSingleExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
-   Token peekedToken, nextToken;
-   int readResult, nextTokenReadResult, parseResult;
-   Expr* innerExpr;
+   Token peekedToken;
+   int readResult,  parseResult;
 
    readResult = peekToken(stream, &peekedToken);
    if (readResult == 0)
@@ -362,10 +365,8 @@ int nextTokenIsOperatorWithName(
 int parseParenExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
-   Token peekedToken, nextToken;
+   Token peekedToken;
    int readResult, 
-       nextTokenReadResult,
-       secondExprResult,
        innerParseResult;
    Expr* innerExpr;
 
@@ -387,14 +388,13 @@ int parseParenExpr(
          }
       }
    }
+   return -1;
 }
 int parseMultiExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
-   Token peekedToken, operatorToken;
-   int readResult, 
-       nextTokenReadResult,
-       secondExprResult,
+   Token operatorToken;
+   int secondExprResult,
        parseResult,
        firstParseResult;
    Expr *innerExpr1, *innerExpr2;
@@ -404,7 +404,7 @@ int parseMultiExpr(
    if (firstParseResult == 0) {
       if (nextTokenIsOperatorWithName(stream, "*")
             || nextTokenIsOperatorWithName(stream, "/")) {
-         readResult = readToken(stream, &operatorToken);
+         readToken(stream, &operatorToken);
          secondExprResult = parseMultiExpr(stream, &innerExpr2);
          if (secondExprResult == 0) {
              *expr = createBinaryOperation(
@@ -425,10 +425,8 @@ int parseMultiExpr(
 int parseExpr(
         TokenStreamWithLookAhead* stream, 
         Expr** expr) {
-   Token peekedToken, operatorToken;
-   int readResult, 
-       nextTokenReadResult,
-       secondExprResult,
+   Token operatorToken;
+   int secondExprResult,
        parseResult,
        firstParseResult;
    Expr *innerExpr1, *innerExpr2;
@@ -438,7 +436,7 @@ int parseExpr(
    if (firstParseResult == 0) {
       if (nextTokenIsOperatorWithName(stream, "+")
             || nextTokenIsOperatorWithName(stream, "-")) {
-         readResult = readToken(stream, &operatorToken);
+         readToken(stream, &operatorToken);
          secondExprResult = parseExpr(stream, &innerExpr2);
          if (secondExprResult == 0) {
              *expr = createBinaryOperation(
@@ -455,77 +453,6 @@ int parseExpr(
    }
    return parseResult;
 }
-
-int parseExpr__(
-        TokenStreamWithLookAhead* stream, 
-        Expr** expr) {
-   Token peekedToken, nextToken;
-   int readResult, nextTokenReadResult,secondExprResult;
-   Expr* innerExpr;
-
-   readResult = peekToken(stream, &peekedToken);
-   if (readResult == 0)
-   {
-      if (peekedToken.id == TokPar 
-          && strncmp(peekedToken.buffer,"(",2) == 0) {
-         readToken(stream, &peekedToken);
-         parseExpr(stream,&innerExpr);
-
-
-         if((readResult = readToken(stream, &peekedToken))
-            && peekedToken.id == TokPar
-            && strncmp(peekedToken.buffer, ")",2)) {
-           *expr = innerExpr;
-         printf("2,");
-            return 0;
-         } else {
-         printf("3, -- 00%d ",readResult);
-            return -1;
-         }
-      } else if (peekedToken.id == TokNumeric) {
-         readResult = readToken(stream, &peekedToken);
-         nextTokenReadResult = peekToken(stream, &nextToken);
-         if (nextTokenReadResult == 0
-             && nextToken.id == TokOperator
-	     && strncmp(nextToken.buffer,"+", 1) == 0)
-         {
-           *expr = createNumLiteral(atof(peekedToken.buffer));
-           readToken(stream, &nextToken);
-           secondExprResult = parseExpr(stream, &innerExpr);
-           if (secondExprResult == 0) {
-             *expr = createBinaryOperation(
-                              getNodeTypeFromOperator(nextToken.buffer[0]), *expr, innerExpr);
-             return 0;
-           } else {
-             return 0;
-           }
-         } else {
-           *expr = createNumLiteral(atof(peekedToken.buffer)); 
-           return 0;
-         }
-
-         *expr = createNumLiteral(atof(peekedToken.buffer));
-         return 0;
-      } else {
-         return -1;
-      }
-   }
-   return readResult;
-}
-
-
-
-int parseMultExpression(
-       TokenStreamWithLookAhead* stream, 
-       Expr** expr) {  
-  return -1;
-}
-int parseSumExprExpression(
-       TokenStreamWithLookAhead* stream, 
-       Expr** expr) {
-  return -1;
-}
-
 
 
 TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file)

@@ -261,7 +261,7 @@ void testSubtraction1() {
      return;
    }
    printExpr(expr, &stringOut);
-   tassert_equal_strings("<3 + <3 * <5 / <3 - 5>>>>",
+   tassert_equal_strings("<3 + <<3 * <5 / 3>> - 5>>",
                         getStringFromStringOutStream(&stringOut),
                         __FUNCTION__);
    
