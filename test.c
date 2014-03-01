@@ -271,6 +271,26 @@ void testSubtraction1() {
 }
 
 
+void testParseInvalidExpr1() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + (3 * 5 / 3 - 5";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseExpr(&tokstream, &expr);
+   tassert(parseResult == -1, __FUNCTION__, "Parse error");
+   if (parseResult != -1) {
+     return;
+   }
+   
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+}
+
 
 
 int main(int argc, char* argv[]) {
@@ -288,6 +308,7 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testBasicAdditionParsing1);
   RUN_TEST(testMultiAdditionParsing1);
   RUN_TEST(testSubtraction1);
+  RUN_TEST(testParseInvalidExpr1);
   return 0;
 }
 

@@ -339,6 +339,8 @@ int parseSingleExpr(
        readResult = readToken(stream, &peekedToken);
        *expr = createNumLiteral(atof(peekedToken.buffer)); 
        parseResult = 0;
+     } else {
+       parseResult = -1;
      }
    } else {
      parseResult = parseParenExpr(stream, expr);
