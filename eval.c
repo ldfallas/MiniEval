@@ -203,6 +203,22 @@ double evaluateExpression(Expr* expr)
    double x,y;
    switch(expr->id)
    {
+      case ExprMultiplicationNode: 
+         x = evaluateExpression(getLeftExprFromBin(expr));
+         y = evaluateExpression(getRightExprFromBin(expr));
+         return x * y;
+         break;
+      case ExprDivisionNode: 
+         x = evaluateExpression(getLeftExprFromBin(expr));
+         y = evaluateExpression(getRightExprFromBin(expr));
+         return x / y;
+         break;
+      case ExprSubtractionNode: 
+         x = evaluateExpression(getLeftExprFromBin(expr));
+         y = evaluateExpression(getRightExprFromBin(expr));
+         return x - y;
+         break;
+
       case ExprAdditionNode: 
          x = evaluateExpression(getLeftExprFromBin(expr));
          y = evaluateExpression(getRightExprFromBin(expr));
