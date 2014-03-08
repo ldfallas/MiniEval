@@ -356,10 +356,10 @@ int parseSingleExpr(
        *expr = createNumLiteral(atof(peekedToken.buffer)); 
        parseResult = 0;
      } else {
-       parseResult = -1;
+       parseResult = parseParenExpr(stream, expr);
      }
    } else {
-     parseResult = parseParenExpr(stream, expr);
+     parseResult = -1;
    }
    return parseResult;
 }
@@ -395,14 +395,16 @@ int parseParenExpr(
           && strncmp(peekedToken.buffer,"(",2) == 0) {
          readToken(stream, &peekedToken);
          innerParseResult = parseExpr(stream,&innerExpr);
+
          if(innerParseResult == 0
-	    && (readResult = readToken(stream, &peekedToken))
+	    && ((readResult = peekToken(stream, &peekedToken)) == 0)
             && peekedToken.id == TokPar
-            && strncmp(peekedToken.buffer, ")",2)) {
+            && strncmp(peekedToken.buffer, ")",2) == 0) {
+	   readToken(stream, &peekedToken);
            *expr = innerExpr;
-            return 0;
+	   return 0;
          } else {
-            return -1;
+	   return -1;
          }
       }
    }
@@ -462,7 +464,6 @@ int parseExpr(
                          innerExpr1, 
                          innerExpr2);
              parseResult = 0;
-
          }
       } else {
          *expr = innerExpr1;
@@ -473,8 +474,7 @@ int parseExpr(
 }
 
 
-TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file)
-{
+TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file) {
   TokenStreamWithLookAhead result;  
   result.kind = TOK_STREAM_KIND_FILE;
   result.stream = file;
@@ -482,8 +482,7 @@ TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file)
   return result;
 }
 
-TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content)
-{
+TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content) {
   TokenStreamWithLookAhead result;
   result.kind = TOK_STREAM_KIND_STRING;  
   result.buffer.position = -1;
@@ -494,8 +493,7 @@ TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content)
 }
 
 int readToken(TokenStreamWithLookAhead* tokStream,
-              Token* resultToken)
-{
+              Token* resultToken) {
    if (tokStream->bufferedToken == NULL) {
       return read_tok(tokStream, resultToken);
    } else {
@@ -508,8 +506,7 @@ int readToken(TokenStreamWithLookAhead* tokStream,
 }
 
 int peekToken(TokenStreamWithLookAhead* tokStream,
-              Token* resultToken)
-{
+              Token* resultToken) {
    int result;
    if (tokStream->bufferedToken == NULL) {
       result = read_tok(tokStream, resultToken);

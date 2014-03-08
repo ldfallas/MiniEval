@@ -291,6 +291,32 @@ void testParseInvalidExpr1() {
    destroyOutStream(&stringOut);
 }
 
+void testParseParenExpr1() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 * (3 - 5 + 3) / 5";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("<3 * <<3 - <5 + 3>> / 5>>",
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+
+}
+
 void testEvaluation1() {
    Expr* expr;
    int parseResult;
@@ -317,6 +343,31 @@ void testEvaluation1() {
    
 }
 
+void testParsingNumbers() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3.4 + 0.4";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseExpr(&tokstream, &expr);
+   tassert(!parseResult, __FUNCTION__, "Parse error");
+   if (parseResult) {
+     return;
+   }
+   printExpr(expr, &stringOut);
+   tassert_equal_strings("<3.4 + 0.4>",
+                        getStringFromStringOutStream(&stringOut),
+                        __FUNCTION__);
+   
+   deepReleaseExpr(expr);
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+}
+
 
 int main(int argc, char* argv[]) {
   
@@ -335,90 +386,12 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testSubtraction1);
   RUN_TEST(testParseInvalidExpr1);  
   RUN_TEST(testEvaluation1);
+  RUN_TEST(testParsingNumbers);
+  RUN_TEST(testParseParenExpr1);
   return 0;
 }
 
 
-int ___main(int argc, char* argv[]) {
 
-   FILE* aFile;
-   /*   Token t;*/
-   int result;
-   Expr* expr;
-   int parseResult;
-   Expr* expr2;
-   TokenStreamWithLookAhead tokstream;
-   result = 0;
-   if (argc == 2) {
-      aFile = fopen(argv[1],"r");
-      if (aFile != NULL) {
-        /*         while(read_tok(aFile, &t) != -1)
-         {
-            printf("------");
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-            }*/
-         fclose(aFile);
-         printf("*******************\n");
-         aFile = fopen(argv[1],"r");
-         tokstream = createTokenStreamWithLookAhead(aFile);
-         parseResult = parseExpr(&tokstream, &expr2);
-         printf("!--parse result %d\n", parseResult);
-         if(!parseResult) { 
-            printf("!parse result %d\n", parseResult);
-            /*printExpr(expr2);*/
-         }
-
-         /*
-         readToken(&tokstream, &t);
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-         readToken(&tokstream, &t);
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-         peekToken(&tokstream, &t);
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-         readToken(&tokstream, &t);
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-         readToken(&tokstream, &t);
-            printf("token id=%d\n", t.id);
-            printf("token buffer='%s'\n", t.buffer);
-            */
-         releaseTokStream(&tokstream);
-         fclose(aFile);
-      } else {
-         printf("could not open file");
-         result = 1;
-      }
-   } else {
-      result = 1;
-      printf("wrong number of arguments");
-   }
-
-
-   /*while(1){*/
-      expr =
-         createAddition(
-               createAddition(
-                  createNumLiteral(10.2),
-                  createNumLiteral(-13)),
-               createNumLiteral(13));
-      printf(
-            "\n%g\n",
-            evaluateExpression(
-               expr
-               )
-            ); 
-      /*      printExpr(expr);
-              printf("\n");*/
-      deepReleaseExpr(expr);
-
-   /*}*/
-   return result;
-
-
-}
 
 
