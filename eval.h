@@ -46,7 +46,8 @@ typedef struct {
       char* content;
     } buffer;
   };
-  Token* bufferedToken; 
+  Token bufferedToken;
+  int hasBufferedToken;
 } TokenStreamWithLookAhead;
 
 #define TOK_STREAM_KIND_FILE   100

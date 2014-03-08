@@ -483,7 +483,8 @@ TokenStreamWithLookAhead createTokenStreamWithLookAhead(FILE* file) {
   TokenStreamWithLookAhead result;  
   result.kind = TOK_STREAM_KIND_FILE;
   result.stream = file;
-  result.bufferedToken = NULL;
+  /*result.bufferedToken = NULL;*/
+  result.hasBufferedToken = 0;
   return result;
 }
 
@@ -493,19 +494,21 @@ TokenStreamWithLookAhead createTokenStreamWithLookAheadFromString(char* content)
   result.buffer.position = -1;
   result.buffer.maxValue = strlen(content);
   result.buffer.content = content;
-  result.bufferedToken = NULL;
+  /*result.bufferedToken = NULL;*/
+  result.hasBufferedToken = 0;
   return result;
 }
 
 int readToken(TokenStreamWithLookAhead* tokStream,
               Token* resultToken) {
-   if (tokStream->bufferedToken == NULL) {
+   if (!tokStream->hasBufferedToken) {
       return read_tok(tokStream, resultToken);
    } else {
       /**resultToken = *tokStream->bufferedToken;*/
-      memcpy(resultToken, tokStream->bufferedToken, sizeof(Token));
-      free(tokStream->bufferedToken);
-      tokStream->bufferedToken = NULL;
+      memcpy(resultToken, &tokStream->bufferedToken, sizeof(Token));
+      /*free(tokStream->bufferedToken);*/
+      /*tokStream->bufferedToken = NULL;*/
+      tokStream->hasBufferedToken = 0;
       return 1; 
    }
 }
@@ -513,24 +516,24 @@ int readToken(TokenStreamWithLookAhead* tokStream,
 int peekToken(TokenStreamWithLookAhead* tokStream,
               Token* resultToken) {
    int result;
-   if (tokStream->bufferedToken == NULL) {
+   if (!tokStream->hasBufferedToken) {
       result = read_tok(tokStream, resultToken);
-      tokStream->bufferedToken = (Token*)malloc(sizeof(Token));
-      *(tokStream->bufferedToken) =  *resultToken;
+      /*tokStream->bufferedToken = (Token*)malloc(sizeof(Token));*/
+      tokStream->bufferedToken =  *resultToken;
+      tokStream->hasBufferedToken = 1;
       return result;
    } else {
       /* *resultToken = *tokStream->bufferedToken; */
-      memcpy(resultToken, tokStream->bufferedToken, sizeof(Token));
-      /*tokStream->bufferedToken = NULL;*/
+      memcpy(resultToken, &tokStream->bufferedToken, sizeof(Token));
       return 0; 
    }
 }
 
 void releaseTokStream(TokenStreamWithLookAhead* tokStream)
-{
+{/*
    if (tokStream->bufferedToken != NULL) {
       free(tokStream->bufferedToken);
-   }
+   }*/
 }
 
 
