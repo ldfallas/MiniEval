@@ -291,6 +291,47 @@ void testParseInvalidExpr1() {
    destroyOutStream(&stringOut);
 }
 
+void testParseInvalidExpr2() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + * 3 * 5 / 3 - 5";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseExpr(&tokstream, &expr);
+   tassert(parseResult == -1, __FUNCTION__, "Parse error");
+   if (parseResult != -1) {
+     return;
+   }
+   
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+}
+
+void testParseInvalidExpr3() {
+   Expr* expr;
+   OutStream stringOut;
+   int parseResult;
+   TokenStreamWithLookAhead tokstream;
+   char* stringToParse;
+
+   stringToParse = "3 + ";
+   stringOut = createStringOutStream(15);
+   tokstream = createTokenStreamWithLookAheadFromString(stringToParse);
+   parseResult = parseExpr(&tokstream, &expr);
+   tassert(parseResult == -1, __FUNCTION__, "Parse error");
+   if (parseResult != -1) {
+     return;
+   }
+   
+   releaseTokStream(&tokstream);
+   destroyOutStream(&stringOut);
+}
+
+
 void testParseParenExpr1() {
    Expr* expr;
    OutStream stringOut;
@@ -372,7 +413,7 @@ void testParsingNumbers() {
 int main(int argc, char* argv[]) {
   
   printf("Running tests\n");
-
+  
   RUN_TEST(testStrBuffer1);
   RUN_TEST(testStrBuffer2);
   RUN_TEST(testStrBuffer3);
@@ -385,9 +426,12 @@ int main(int argc, char* argv[]) {
   RUN_TEST(testMultiAdditionParsing1);
   RUN_TEST(testSubtraction1);
   RUN_TEST(testParseInvalidExpr1);  
+  RUN_TEST(testParseInvalidExpr2);  
+  RUN_TEST(testParseInvalidExpr3);  
   RUN_TEST(testEvaluation1);
   RUN_TEST(testParsingNumbers);
   RUN_TEST(testParseParenExpr1);
+  
   return 0;
 }
 

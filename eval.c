@@ -404,6 +404,7 @@ int parseParenExpr(
            *expr = innerExpr;
 	   return 0;
          } else {
+	   deepReleaseExpr(innerExpr);
 	   return -1;
          }
       }
@@ -432,7 +433,8 @@ int parseMultiExpr(
                          innerExpr1, 
                          innerExpr2);
              parseResult = 0;
-
+         } else {
+           deepReleaseExpr(innerExpr1);
          }
       } else {
          *expr = innerExpr1;
@@ -464,6 +466,9 @@ int parseExpr(
                          innerExpr1, 
                          innerExpr2);
              parseResult = 0;
+         }
+         else {
+           deepReleaseExpr(innerExpr1);
          }
       } else {
          *expr = innerExpr1;
