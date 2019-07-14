@@ -575,7 +575,7 @@ void destroyOutStream(const OutStream* stream) {
 }
 
 
-inline int _max(int x, int y) {
+int _max(int x, int y) {
   return x > y ? x : y;
 }
 

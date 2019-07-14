@@ -101,7 +101,7 @@ void testStrBuffer4() {
 
 void test1() {
    Expr* expr;
-   char txt1[5];
+   char txt1[16];
    expr =
       createAddition(
             createAddition(
@@ -109,7 +109,7 @@ void test1() {
                createNumLiteral(-13)),
             createNumLiteral(13));
    snprintf(
-         txt1, 5,
+         txt1, 15,
          "%g",
          evaluateExpression(
             expr
